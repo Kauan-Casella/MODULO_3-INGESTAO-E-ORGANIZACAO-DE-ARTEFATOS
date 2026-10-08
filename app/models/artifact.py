@@ -5,7 +5,6 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
 
-
 class Artifact(Base):
     __tablename__ = "artifacts"
 

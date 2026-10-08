@@ -4,7 +4,7 @@ from app.database import Base, engine
 from app.models import Artifact, Project
 from app.routers.artifacts import router as artifacts_router
 from app.routers.projects import router as projects_router
-
+from app.routers.versions import router as versions_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -18,7 +18,7 @@ app = FastAPI(
 
 app.include_router(projects_router)
 app.include_router(artifacts_router)
-
+app.include_router(versions_router)
 
 @app.get("/")
 def root():
