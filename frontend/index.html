@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>Artifact Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
+</head>
+<body>
+    <aside class="sidebar">
+        <a class="brand" href="#" aria-label="Artifact Manager, início">
+            <span class="brand-mark" aria-hidden="true">◆</span>
+            <span>Artifact<span class="brand-light">Manager</span></span>
+        </a>
+        <p class="sidebar-label">ESPAÇO DE TRABALHO</p>
+        <nav aria-label="Navegação principal">
+            <a class="nav-item active" href="#projects"><span aria-hidden="true">▦</span> Projetos e artefatos</a>
+        </nav>
+        <div class="sidebar-footer">
+            <span class="status-dot"></span>
+            <span>Serviço FastAPI</span>
+            <span class="footer-status">local</span>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">MÓDULO 3 <span>/</span> MVP</p>
+                <h1>Central de artefatos</h1>
+                <p class="subtitle">Organize documentos do projeto, arquivos e histórico de versões.</p>
+            </div>
+            <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Alternar tema">
+                <span id="theme-icon" aria-hidden="true">☾</span>
+                <span id="theme-label">Modo escuro</span>
+            </button>
+        </header>
+
+        <section class="stats-grid" aria-label="Resumo do espaço de trabalho">
+            <article class="stat-card">
+                <div class="stat-topline"><span class="stat-label">Projeto selecionado</span><span class="stat-icon">▦</span></div>
+                <strong id="selected-project-stat" class="metric">Nenhum</strong>
+                <span class="stat-note">Espaço de trabalho atual</span>
+            </article>
+            <article class="stat-card">
+                <div class="stat-topline"><span class="stat-label">Artefatos</span><span class="stat-icon">▤</span></div>
+                <strong id="artifact-count" class="metric">0</strong>
+                <span class="stat-note">No projeto selecionado</span>
+            </article>
+            <article class="stat-card">
+                <div class="stat-topline"><span class="stat-label">Status da API</span><span class="stat-icon">⌁</span></div>
+                <strong id="api-status" class="metric">Verificando…</strong>
+                <span class="stat-note">Disponibilidade do FastAPI</span>
+            </article>
+        </section>
+
+        <section id="projects" class="panel">
+            <div class="section-heading">
+                <div>
+                    <p class="section-kicker">ORGANIZAÇÃO</p>
+                    <h2>Projetos</h2>
+                    <p>Crie um projeto ou selecione um espaço existente.</p>
+                </div>
+            </div>
+            <form id="project-form" class="project-form">
+                <div class="field">
+                    <label for="project-name">Nome do projeto</label>
+                    <input id="project-name" name="name" placeholder="Ex.: Plataforma de Engenharia" required>
+                </div>
+                <div class="field field-grow">
+                    <label for="project-description">Descrição <span class="optional">(opcional)</span></label>
+                    <input id="project-description" name="description" placeholder="Objetivo ou contexto do projeto">
+                </div>
+                <button class="primary-button" type="submit"><span aria-hidden="true">＋</span> Criar projeto</button>
+            </form>
+            <div class="project-selector">
+                <label for="project-select">Projeto ativo</label>
+                <select id="project-select">
+                    <option value="">Carregando projetos…</option>
+                </select>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="section-heading section-heading-row">
+                <div>
+                    <p class="section-kicker">ARQUIVOS DO PROJETO</p>
+                    <h2>Artefatos</h2>
+                    <p>Envie, baixe e mantenha o histórico dos arquivos técnicos.</p>
+                </div>
+                <button id="refresh-artifacts" class="secondary-button" type="button"><span aria-hidden="true">↻</span> Atualizar</button>
+            </div>
+            <form id="upload-form" class="upload-area">
+                <div class="upload-symbol" aria-hidden="true">↑</div>
+                <div class="upload-copy">
+                    <strong>Adicionar artefato</strong>
+                    <p>Formatos aceitos conforme validação da API: PDF, Markdown, PNG e JPEG.</p>
+                    <label class="file-picker" for="artifact-file">Escolher arquivo</label>
+                    <input id="artifact-file" type="file" accept=".pdf,.md,.markdown,.png,.jpg,.jpeg" required>
+                    <span id="selected-file-name" class="selected-file-name">Nenhum arquivo selecionado</span>
+                </div>
+                <button class="primary-button upload-button" type="submit">Enviar arquivo</button>
+            </form>
+            <div class="list-heading"><span>Nome do artefato</span><span>Ações</span></div>
+            <div id="artifact-list" class="artifact-list">
+                <p class="empty-state">Selecione um projeto para visualizar os artefatos.</p>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="section-heading">
+                <div>
+                    <p class="section-kicker">RASTREABILIDADE</p>
+                    <h2>Histórico de versões</h2>
+                    <p id="history-description">Selecione “Histórico” em um artefato para consultar as versões.</p>
+                </div>
+            </div>
+            <div id="version-list" class="version-list">
+                <p class="empty-state">Nenhum artefato selecionado.</p>
+            </div>
+        </section>
+        <div id="message" class="message" role="status" aria-live="polite"></div>
+        <footer class="page-footer">Artifact Manager <span>·</span> Módulo 3 — Ingestão e Organização de Artefatos</footer>
+    </main>
+</body>
+</html>

@@ -86,6 +86,10 @@ async def create_version(
         file_path=str(file_path),
     )
 
+    artifact.version = new_version_number
+    artifact.file_path = str(file_path)
+
+    db.add(artifact)
     db.add(version)
     db.commit()
     db.refresh(version)
@@ -98,7 +102,7 @@ def list_versions(
     artifact_id: int,
     db: Session = Depends(get_db),
 ):
-    # Verify that the artifact exists
+    # Verifica se o artefato existe
     artifact = (
         db.query(Artifact)
         .filter(

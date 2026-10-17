@@ -1,10 +1,8 @@
 # MODULO_3-INGESTAO-E-ORGANIZACAO-DE-ARTEFATOS
 
-<<<<<<< HEAD
-v.0.2.0
+v.0.3 ediçao MVP
 
 Atualizacoes
-=======
 Como rodar o fastAPI localmente:
 
 No prompt de comando:
@@ -17,4 +15,6 @@ uvicorn app.main:app --reload
 E abrir:
 
 http://127.0.0.1:8000/docs
->>>>>>> fca8f97 (nova versao)
+
+Como rodar o front end:
+
