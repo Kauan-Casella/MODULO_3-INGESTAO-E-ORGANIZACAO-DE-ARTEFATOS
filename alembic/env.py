@@ -12,6 +12,17 @@ from app.models import Project, Artifact, ArtifactVersion
 # access to the values within the .ini file in use.
 config = context.config
 
+import os  # NOVO
+
+# NOVO: no Azure, usa a DATABASE_URL da variável de ambiente
+_db_url = os.getenv("DATABASE_URL")
+if _db_url:
+    if _db_url.startswith("postgres://"):
+        _db_url = _db_url.replace("postgres://", "postgresql+psycopg://", 1)
+    elif _db_url.startswith("postgresql://"):
+        _db_url = _db_url.replace("postgresql://", "postgresql+psycopg://", 1)
+    config.set_main_option("sqlalchemy.url", _db_url)
+
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
