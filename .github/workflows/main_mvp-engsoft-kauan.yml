@@ -68,7 +68,7 @@ jobs:
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_4FC853DD20CB49D7A55582B8727344F0 }}
 
       - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v3
+        uses: azure/webapps-deploy@v3 
         id: deploy-to-webapp
         with:
           app-name: 'mvp-engsoft-kauan'
