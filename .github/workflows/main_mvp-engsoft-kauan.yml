@@ -16,6 +16,22 @@ jobs:
     permissions:
       contents: read #This is required for actions/checkout
 
+    # NOVO: Postgres temporário só para os testes (usa os mesmos dados padrão do database.py)
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: artifact_user
+          POSTGRES_PASSWORD: artifact_password
+          POSTGRES_DB: artifact_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U artifact_user"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
     steps:
       - uses: actions/checkout@v4
 
