@@ -63,12 +63,12 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_EB007969CDA34E83911126C135134D87 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_0A01BFB5AC7947859D4E143AEAF10C07 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_4FC853DD20CB49D7A55582B8727344F0 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_7E872FFCA10D4E47B5F3FA09508AECC4 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_877DB9BF97E04343AF4376C139592707 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_563564E39FC94E43A85A313AB01AF114 }}
 
       - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v3 
+        uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
           app-name: 'mvp-engsoft-kauan'
