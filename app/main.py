@@ -5,6 +5,7 @@ from app.models import Artifact, Project
 from app.routers.artifacts import router as artifacts_router
 from app.routers.projects import router as projects_router
 from app.routers.versions import router as versions_router
+from app.error_handlers import register_exception_handlers
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -41,3 +42,5 @@ def health_check():
     return {
         "status": "healthy"
     }
+
+register_exception_handlers(app)

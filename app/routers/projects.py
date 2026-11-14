@@ -1,4 +1,4 @@
-
+from sqlalchemy.exc import SQLAlchemyError
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -23,11 +23,16 @@ def create_project(
         description=project.description,
     )
 
-    db.add(new_project)
-    db.commit()
-    db.refresh(new_project)
+    try:
+        db.add(new_project)
+        db.commit()
+        db.refresh(new_project)
 
-    return new_project
+        return new_project
+
+    except SQLAlchemyError:
+        db.rollback()
+        raise
 
 
 @router.get("/", response_model=list[ProjectResponse])

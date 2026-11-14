@@ -1,6 +1,12 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String
+from sqlalchemy import (
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -8,6 +14,14 @@ from app.database import Base
 
 class ArtifactVersion(Base):
     __tablename__ = "artifact_versions"
+
+    __table_args__ = (
+        UniqueConstraint(
+            "artifact_id",
+            "version_number",
+            name="uq_artifact_version_number",
+        ),
+    )
 
     id: Mapped[int] = mapped_column(
         primary_key=True,

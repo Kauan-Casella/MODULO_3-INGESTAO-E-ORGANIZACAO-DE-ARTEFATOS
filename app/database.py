@@ -1,11 +1,12 @@
+import os
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 
-DATABASE_URL = (
-    "postgresql+psycopg://"
-    "artifact_user:artifact_password"
-    "@localhost:5432/artifact_db"
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql+psycopg://artifact_user:artifact_password@localhost:5432/artifact_db",
 )
 
 

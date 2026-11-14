@@ -1,20 +1,13 @@
 services:
-
-  postgres:
-    image: postgres:17
-    container_name: artifact-postgres
+  api:
+    build: .
+    container_name: artifact-api
     restart: unless-stopped
-
     environment:
-      POSTGRES_USER: artifact_user
-      POSTGRES_PASSWORD: artifact_password
-      POSTGRES_DB: artifact_db
-
+      DATABASE_URL: postgresql+psycopg://artifact_user:${POSTGRES_PASSWORD}@host.docker.internal:5432/artifact_db
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
-      - "5432:5432"
-
+      - "8000:8000"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-volumes:
-  postgres_data:
+      - ./storage:/app/storage
