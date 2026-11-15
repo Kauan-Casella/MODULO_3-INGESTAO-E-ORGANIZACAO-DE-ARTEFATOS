@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Artifact Service · Módulo 3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+/* tokens.css — Guia de Identidade Visual, Módulo 6 */
+:root{
+  --color-primary:#1E2A5A; --color-primary-hover:#2F3F7F; --color-brand-accent:#C8102E;
+  --color-bg:#F6F7FA; --color-surface:#FFFFFF; --color-border:#E2E5EC;
+  --color-text:#1A1D29; --color-text-muted:#5B6275;
+  --color-priority-critical:#DC2626; --color-priority-high:#EA580C;
+  --color-priority-medium:#B45309; --color-priority-low:#64748B; --color-success:#16A34A;
+  --font-sans:"Inter",system-ui,sans-serif; --font-mono:"JetBrains Mono",ui-monospace,monospace;
+  --text-xs:12px; --text-sm:14px; --text-md:16px; --text-lg:20px; --text-xl:24px; --text-2xl:32px;
+  --link:var(--color-primary);
+}
+[data-theme="dark"]{
+  --color-bg:#0F1220; --color-surface:#181C2E; --color-border:#2A2F45;
+  --color-text:#E8EAF2; --color-text-muted:#9AA0B4; --link:var(--color-text);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--color-bg);color:var(--color-text);font:400 var(--text-sm)/1.5 var(--font-sans)}
+a{color:var(--link)}
+:focus-visible{outline:2px solid var(--color-primary-hover);outline-offset:2px}
+[data-theme="dark"] :focus-visible{outline-color:var(--color-text)}
+nav{background:var(--color-primary);color:#fff;display:flex;align-items:center;gap:16px;padding:12px 24px}
+nav a{color:#fff;text-decoration:none}
+.logo{display:flex;align-items:center;gap:10px;font-weight:600;font-size:var(--text-md)}
+.logo i{width:6px;height:24px;background:var(--color-brand-accent);display:block;border-radius:2px}
+nav .sp{flex:1}
+main{max-width:960px;margin:0 auto;padding:24px}
+h1{font-size:var(--text-xl);font-weight:600;margin:0 0 4px}
+h2{font-size:var(--text-lg);font-weight:600;margin:0 0 8px}
+.muted{color:var(--color-text-muted);font-size:var(--text-xs);font-weight:500}
+.card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:8px;padding:16px;margin:12px 0}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.row.between{justify-content:space-between}
+input,select,textarea{font:inherit;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-border);border-radius:6px;padding:8px 10px}
+input[type=file]{padding:6px}
+textarea{width:100%;resize:vertical}
+.btn{font:500 var(--text-md)/1 var(--font-sans);background:var(--color-primary);color:#fff;border:1px solid var(--color-primary-hover);border-radius:6px;padding:10px 16px;cursor:pointer;text-decoration:none;display:inline-block}
+.btn:hover{background:var(--color-primary-hover)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--link);border-color:var(--color-border)}
+.btn.ghost:hover{background:var(--color-bg)}
+nav .btn{font-size:var(--text-sm);padding:8px 12px;background:transparent;border-color:rgba(255,255,255,.4)}
+.sel{border-left:4px solid var(--color-priority-low)}
+.sel.COMPLETED{border-left-color:var(--color-success)}
+.sel.FAILED{border-left-color:var(--color-priority-critical)}
+.badge{display:inline-block;font:600 var(--text-xs)/1 var(--font-sans);color:#fff;border-radius:4px;padding:5px 8px;background:var(--color-priority-low)}
+.badge.COMPLETED{background:var(--color-success)}
+.badge.FAILED{background:var(--color-priority-critical)}
+.badge.type{background:transparent;color:var(--color-text-muted);border:1px solid var(--color-border)}
+.bar{height:8px;background:var(--color-border);border-radius:4px;overflow:hidden;min-width:160px;flex:1}
+.bar b{display:block;height:100%;background:var(--color-primary)}
+[data-theme="dark"] .bar b{background:var(--color-text-muted)}
+.metric{font-variant-numeric:tabular-nums;font-weight:600}
+code,pre,.mono{font-family:var(--font-mono);font-size:var(--text-sm)}
+pre{background:var(--color-bg);border:1px solid var(--color-border);border-radius:6px;padding:10px;overflow:auto;margin:6px 0}
+ul.ev{margin:6px 0;padding-left:20px}
+.err{border-left:4px solid var(--color-priority-critical)}
+.empty{text-align:center;color:var(--color-text-muted);padding:32px 16px}
+.drop{border:2px dashed var(--color-border);border-radius:8px;padding:16px}
+@media (prefers-reduced-motion:no-preference){.bar b{transition:width .4s}}
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="#/"><i></i>Artifact Service</a>
+  <span class="muted" style="color:rgba(255,255,255,.75)">Módulo 3 · Ingestão e organização de artefatos</span>
+  <span class="sp"></span>
+  <button class="btn" id="theme" type="button">Modo escuro</button>
+</nav>
+<main id="app" aria-live="polite"></main>
+
+<script>
+/* URL do back-end: local em desenvolvimento, e a URL pública após o deploy do back (sem barra no final) */
+const PROD_API = "https://modulo3-fhgjdpa6d5bbfvff.canadacentral-01.azurewebsites.net"; // TROCAR após o deploy do back
+const API = ["127.0.0.1", "localhost"].includes(location.hostname) ? "http://127.0.0.1:8000" : PROD_API;
+
+/* rota de versões (app/routers/versions.py) */
+const EP = { versions: (pid, aid) => `/projects/${pid}/artifacts/${aid}/versions` };
+
+const LABELS = {
+  requirements_specification:"Especificação de requisitos", user_story:"História de usuário",
+  meeting_minutes:"Ata de reunião", project_plan:"Plano de projeto",
+  architecture_document:"Documento de arquitetura", technical_documentation:"Documentação técnica",
+  test_documentation:"Documentação de testes", diagram:"Diagrama", other:"Outro"
+};
+const STATUS = { PENDING:"Na fila", PROCESSING:"Processando", COMPLETED:"Concluída", FAILED:"Falhou" };
+
+const $ = s => document.querySelector(s);
+const app = $("#app");
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = d => d ? new Date(d.endsWith("Z") ? d : d + "Z").toLocaleString("pt-BR") : "";
+
+async function api(path, opts) {
+  let r;
+  try { r = await fetch(API + path, opts); }
+  catch { throw new Error(`Não foi possível conectar ao back-end em ${API}. Verifique se o uvicorn está rodando.`); }
+  if (!r.ok) {
+    let d; try { d = (await r.json()).detail; } catch {}
+    if (Array.isArray(d)) d = d.map(e => e.msg).join("; ");
+    throw new Error(d || `Erro ${r.status}`);
+  }
+  return (r.headers.get("content-type") || "").includes("json") ? r.json() : r;
+}
+const banner = (msg) => { const b = $("#msg"); if (b) b.innerHTML = msg ? `<div class="card err" role="alert">${esc(msg)}</div>` : ""; };
+
+/* tema */
+const setTheme = t => { document.documentElement.dataset.theme = t; $("#theme").textContent = t === "dark" ? "Modo claro" : "Modo escuro"; try{localStorage.setItem("theme", t)}catch{} };
+$("#theme").onclick = () => setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+let saved = "light"; try { saved = localStorage.getItem("theme") || (matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light"); } catch {}
+setTheme(saved);
+
+/* ---------- Projetos ---------- */
+async function viewProjects() {
+  app.innerHTML = `<h1>Projetos</h1><p class="muted">Escolha um projeto para ver e enviar artefatos.</p><div id="msg"></div>
+  <form class="card" id="np"><h2>Novo projeto</h2>
+    <div class="row"><input id="pn" placeholder="Nome do projeto" required maxlength="120" style="flex:1;min-width:200px">
+    <button class="btn" type="submit">Criar projeto</button></div>
+    <textarea id="pd" rows="2" placeholder="Descrição (opcional)" style="margin-top:8px"></textarea></form>
+  <div id="list"><p class="muted">Carregando…</p></div>`;
+  const load = async () => {
+    try {
+      const ps = await api("/projects/");
+      $("#list").innerHTML = ps.length ? ps.map(p => `<a class="card" href="#/p/${p.id}" style="display:block;text-decoration:none;color:inherit">
+        <h2>${esc(p.name)}</h2><div class="muted">${esc(p.description || "Sem descrição")}</div></a>`).join("")
+        : `<div class="card empty">Nenhum projeto ainda. Crie o primeiro acima.</div>`;
+    } catch (e) { $("#list").innerHTML = ""; banner(e.message); }
+  };
+  $("#np").onsubmit = async ev => {
+    ev.preventDefault(); banner("");
+    try {
+      await api("/projects/", { method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ name: $("#pn").value.trim(), description: $("#pd").value.trim() || null }) });
+      $("#np").reset(); load();
+    } catch (e) { banner(e.message); }
+  };
+  load();
+}
+
+/* ---------- Artefatos de um projeto ---------- */
+async function viewProject(pid) {
+  app.innerHTML = `<p><a href="#/">← Projetos</a></p><h1 id="pt">Projeto</h1><p class="muted" id="pdsc"></p><div id="msg"></div>
+  <form class="card drop" id="up"><h2>Enviar artefato</h2>
+    <div class="row"><input type="file" id="f" accept=".pdf,.md,.markdown,.png,.jpg,.jpeg" required>
+    <button class="btn" type="submit" id="ub">Enviar</button></div>
+    <div class="muted" style="margin-top:6px">PDF, Markdown, PNG ou JPEG · até 20 MB · apenas PDF e Markdown podem ser analisados pela IA</div></form>
+  <div class="row" style="margin-top:16px"><h2 style="margin:0;flex:1">Artefatos</h2>
+    <input id="q" type="search" placeholder="Buscar por nome" aria-label="Buscar por nome">
+    <select id="t" aria-label="Filtrar por tipo"><option value="">Todos os tipos</option><option>PDF</option><option>MARKDOWN</option><option>PNG</option><option>JPEG</option></select></div>
+  <div id="list"><p class="muted">Carregando…</p></div>`;
+  try { const p = await api(`/projects/${pid}`); $("#pt").textContent = p.name; $("#pdsc").textContent = p.description || ""; }
+  catch (e) { banner(e.message); }
+
+  const load = async () => {
+    const qs = new URLSearchParams(); if ($("#q").value.trim()) qs.set("search", $("#q").value.trim()); if ($("#t").value) qs.set("artifact_type", $("#t").value);
+    try {
+      const arts = await api(`/projects/${pid}/artifacts/?${qs}`);
+      $("#list").innerHTML = arts.length ? arts.map(a => card(pid, a)).join("") : `<div class="card empty">Nenhum artefato encontrado.</div>`;
+    } catch (e) { $("#list").innerHTML = ""; banner(e.message); }
+  };
+  let tm; $("#q").oninput = () => { clearTimeout(tm); tm = setTimeout(load, 300); };
+  $("#t").onchange = load;
+
+  $("#up").onsubmit = async ev => {
+    ev.preventDefault(); banner("");
+    let f = $("#f").files[0]; if (!f) return;
+    if (/\.(md|markdown)$/i.test(f.name) && f.type !== "text/markdown") f = new File([f], f.name, { type:"text/markdown" }); // o back exige text/markdown
+    const fd = new FormData(); fd.append("file", f);
+    $("#ub").disabled = true; $("#ub").textContent = "Enviando…";
+    try { await api(`/projects/${pid}/artifacts/`, { method:"POST", body: fd }); $("#up").reset(); await load(); }
+    catch (e) { banner(e.message); }
+    $("#ub").disabled = false; $("#ub").textContent = "Enviar";
+  };
+
+  $("#list").onclick = async ev => {
+    const b = ev.target.closest("[data-an],[data-vs],[data-van]"); if (!b) return;
+    if (b.dataset.an) return runAnalysis(pid, b.dataset.an, b);
+    if (b.dataset.van) return runAnalysisFor(b.dataset.van, b, $(`#an-v${b.dataset.van}`));
+    const box = $(`#vs-${b.dataset.vs}`);
+    if (box.innerHTML) { box.innerHTML = ""; return; }
+    loadVersions(pid, b.dataset.vs, b.dataset.type);
+  };
+  $("#list").onsubmit = async ev => {
+    const f = ev.target.closest("form[data-vu]"); if (!f) return;
+    ev.preventDefault(); banner("");
+    const aid = f.dataset.vu; let file = f.querySelector("input").files[0]; if (!file) return;
+    if (/\.(md|markdown)$/i.test(file.name) && file.type !== "text/markdown") file = new File([file], file.name, { type:"text/markdown" });
+    const fd = new FormData(); fd.append("file", file);
+    try { await api(EP.versions(pid, aid), { method:"POST", body: fd }); await load(); await loadVersions(pid, aid, f.dataset.type); }
+    catch (e) { banner(e.message); }
+  };
+  load();
+}
+
+function card(pid, a) {
+  const can = ["PDF", "MARKDOWN"].includes(a.artifact_type);
+  return `<div class="card" id="art-${a.id}"><div class="row between">
+    <div><h2 style="margin:0">${esc(a.name)}</h2>
+    <div class="row" style="gap:8px;margin-top:4px"><span class="badge type">${esc(a.artifact_type)}</span><span class="muted">versão <span class="metric">${esc(a.version)}</span></span></div></div>
+    <div class="row">
+      <a class="btn ghost" href="${API}/projects/${pid}/artifacts/${a.id}/download">Baixar</a>
+      <button class="btn ghost" data-vs="${a.id}" data-type="${esc(a.artifact_type)}">Versões</button>
+      <button class="btn" data-an="${a.id}" ${can ? "" : "disabled title=\"A análise de IA aceita apenas PDF e Markdown\""}>Analisar com IA</button>
+    </div></div><div class="an" id="an-${a.id}"></div><div id="vs-${a.id}"></div></div>`;
+}
+
+/* ---------- Análise de IA ---------- */
+async function versionId(pid, aid) {
+  try {
+    const vs = await api(EP.versions(pid, aid));
+    if (Array.isArray(vs) && vs.length) return vs.reduce((m, v) => (v.version_number ?? v.id) > (m.version_number ?? m.id) ? v : m).id;
+  } catch {}
+  const v = prompt("Não consegui descobrir a versão automaticamente.\nInforme o ID da versão do artefato a analisar:");
+  return v && Number(v) > 0 ? Number(v) : null;
+}
+
+async function runAnalysis(pid, aid, btn) {
+  const box = $(`#an-${aid}`);
+  const vid = await versionId(pid, aid); if (!vid) return;
+  btn.disabled = true; btn.textContent = "Analisando…";
+  box.innerHTML = `<div class="card sel PROCESSING"><span class="badge PROCESSING">${STATUS.PROCESSING}</span> <span class="muted">A IA está lendo o documento. Isso pode levar alguns segundos.</span></div>`;
+  try { box.innerHTML = analysisView(await api(`/analyses/versions/${vid}`, { method:"POST" })); }
+  catch (e) { box.innerHTML = `<div class="card err">${esc(e.message)}</div>`; }
+  btn.disabled = false; btn.textContent = "Analisar novamente";
+}
+
+async function loadVersions(pid, aid, type) {
+  const box = $(`#vs-${aid}`); box.innerHTML = `<p class="muted">Carregando versões…</p>`;
+  try {
+    const vs = await api(EP.versions(pid, aid));
+    const can = ["PDF", "MARKDOWN"].includes(type);
+    const acc = { PDF:".pdf", MARKDOWN:".md,.markdown", PNG:".png", JPEG:".jpg,.jpeg" }[type] || "";
+    box.innerHTML = `<h2 style="font-size:var(--text-md);margin:16px 0 8px">Histórico de versões</h2>
+      <form class="row" data-vu="${aid}" data-type="${esc(type)}"><input type="file" accept="${acc}" required>
+      <button class="btn ghost" type="submit">Enviar nova versão</button></form>
+      <div class="muted" style="margin-top:6px">A nova versão deve ter o mesmo tipo do artefato (${esc(type)}).</div>` +
+      vs.map(v => `<div class="row between" style="border-top:1px solid var(--color-border);margin-top:10px;padding-top:10px">
+        <div><strong>Versão <span class="metric">${esc(v.version_number)}</span></strong> <span class="muted">${fmt(v.created_at)}</span></div>
+        ${can ? `<button class="btn ghost" data-van="${v.id}">Analisar esta versão</button>` : ""}</div><div id="an-v${v.id}"></div>`).join("");
+  } catch (e) { box.innerHTML = `<div class="card err">${esc(e.message)}</div>`; }
+}
+
+async function runAnalysisFor(vid, btn, box) {
+  btn.disabled = true; btn.textContent = "Analisando…";
+  box.innerHTML = `<div class="card sel PROCESSING"><span class="badge PROCESSING">${STATUS.PROCESSING}</span> <span class="muted">A IA está lendo o documento. Isso pode levar alguns segundos.</span></div>`;
+  try { box.innerHTML = analysisView(await api(`/analyses/versions/${vid}`, { method:"POST" })); }
+  catch (e) { box.innerHTML = `<div class="card err">${esc(e.message)}</div>`; }
+  btn.disabled = false; btn.textContent = "Analisar novamente";
+}
+
+function analysisView(a) {
+  const pct = a.confidence == null ? null : Math.round(a.confidence * 100);
+  const obj = o => o && Object.keys(o).length ? `<pre>${esc(JSON.stringify(o, null, 2))}</pre>` : "";
+  let h = `<div class="card sel ${esc(a.status)}"><div class="row between"><div class="row" style="gap:10px">
+    <span class="badge ${esc(a.status)}">${esc(STATUS[a.status] || a.status)}</span>
+    <strong>${a.classification ? esc(LABELS[a.classification] || a.classification) : "Sem classificação"}</strong></div>
+    <span class="muted">${esc(a.provider)} · <span class="mono">${esc(a.model_name)}</span></span></div>`;
+  if (a.status === "FAILED") h += `<p>${esc(a.error_message || "A análise falhou.")}</p>`;
+  if (pct != null) h += `<div class="row" style="margin:10px 0"><span class="muted">Confiança</span><div class="bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><b style="width:${pct}%"></b></div><span class="metric">${pct}%</span></div>`;
+  if (a.classification_reason) h += `<h2 style="font-size:var(--text-md)">Por que essa categoria</h2><p style="margin:0">${esc(a.classification_reason)}</p>`;
+  if (a.classification_evidence?.length) h += `<h2 style="font-size:var(--text-md);margin-top:12px">Evidências no documento</h2><ul class="ev">${a.classification_evidence.map(e => `<li>${esc(e)}</li>`).join("")}</ul>`;
+  if (a.summary) h += `<h2 style="font-size:var(--text-md);margin-top:12px">Resumo</h2><p style="margin:0">${esc(a.summary)}</p>`;
+  if (a.architecture && Object.keys(a.architecture).length) h += `<h2 style="font-size:var(--text-md);margin-top:12px">Arquitetura identificada</h2>${obj(a.architecture)}`;
+  if (a.extracted_metadata && Object.keys(a.extracted_metadata).length) h += `<h2 style="font-size:var(--text-md);margin-top:12px">Metadados extraídos</h2>${obj(a.extracted_metadata)}`;
+  return h + `<div class="muted" style="margin-top:10px">Análise #${a.id} · versão ${a.artifact_version_id} · ${fmt(a.completed_at || a.created_at)}</div></div>`;
+}
+
+/* ---------- rotas ---------- */
+function route() {
+  const m = location.hash.match(/^#\/p\/(\d+)/);
+  m ? viewProject(+m[1]) : viewProjects();
+}
+addEventListener("hashchange", route);
+route();
+</script>
+</body>
+</html>
