@@ -20,10 +20,6 @@ Base.metadata.create_all(bind=engine)
 
 
 def get_allowed_origins() -> list[str]:
-    """
-    Lê as origens permitidas da variável FRONTEND_ORIGINS
-    (separadas por vírgula, sem barra no final).
-    """
     raw = os.getenv("FRONTEND_ORIGINS", "http://127.0.0.1:5500")
 
     return [
