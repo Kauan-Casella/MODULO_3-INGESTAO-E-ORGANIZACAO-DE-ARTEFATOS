@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -17,6 +19,20 @@ from app.error_handlers import register_exception_handlers
 Base.metadata.create_all(bind=engine)
 
 
+def get_allowed_origins() -> list[str]:
+    """
+    Lê as origens permitidas da variável FRONTEND_ORIGINS
+    (separadas por vírgula, sem barra no final).
+    """
+    raw = os.getenv("FRONTEND_ORIGINS", "http://127.0.0.1:5500")
+
+    return [
+        origin.strip().rstrip("/")
+        for origin in raw.split(",")
+        if origin.strip()
+    ]
+
+
 app = FastAPI(
     title="Artifact Service",
     description="Módulo de ingestão e organização de artefatos",
@@ -26,9 +42,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://127.0.0.1:5500",
-    ],
+    allow_origins=get_allowed_origins(),
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
