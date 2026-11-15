@@ -33,7 +33,7 @@
             <div>
                 <p class="eyebrow">MÓDULO 3 <span>/</span> MVP</p>
                 <h1>Central de artefatos</h1>
-                <p class="subtitle">Organize documentos do projeto, arquivos e histórico de versões.</p>
+                <p class="subtitle">Organize documentos do projeto, arquivos, histórico de versões e análise por IA.</p>
             </div>
             <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Alternar tema">
                 <span id="theme-icon" aria-hidden="true">☾</span>
@@ -59,6 +59,7 @@
             </article>
         </section>
 
+        <!-- Seção de Projetos -->
         <section id="projects" class="panel">
             <div class="section-heading">
                 <div>
@@ -86,6 +87,7 @@
             </div>
         </section>
 
+        <!-- Seção de Artefatos -->
         <section class="panel">
             <div class="section-heading section-heading-row">
                 <div>
@@ -112,6 +114,7 @@
             </div>
         </section>
 
+        <!-- Seção de Histórico de Versões -->
         <section class="panel">
             <div class="section-heading">
                 <div>
@@ -124,8 +127,58 @@
                 <p class="empty-state">Nenhum artefato selecionado.</p>
             </div>
         </section>
+
+        <!-- NOVA SEÇÃO: Análise por IA (Integração com o novo router /analyses/) -->
+        <section class="panel">
+            <div class="section-heading">
+                <div>
+                    <p class="section-kicker">INTELIGÊNCIA ARTIFICIAL</p>
+                    <h2>Análise de Versão por IA</h2>
+                    <p>Dispare a classificação automática e extração de metadados via Groq.</p>
+                </div>
+            </div>
+            <div class="project-form" style="align-items: flex-end;">
+                <div class="field">
+                    <label for="analysis-version-id">ID da Versão do Artefato</label>
+                    <input id="analysis-version-id" type="number" placeholder="Ex: 1" min="1">
+                </div>
+                <button id="run-analysis-btn" class="primary-button" type="button">Executar Análise IA</button>
+            </div>
+            <div style="margin-top: 15px;">
+                <pre id="analysis-result" style="font-family: var(--font-mono); background: var(--color-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--color-border); font-size: 13px; max-height: 300px; overflow-y: auto; color: var(--color-text);">Nenhuma análise executada ainda...</pre>
+            </div>
+        </section>
+
         <div id="message" class="message" role="status" aria-live="polite"></div>
         <footer class="page-footer">Artifact Manager <span>·</span> Módulo 3 — Ingestão e Organização de Artefatos</footer>
     </main>
+
+    <!-- Script rápido para acionar o endpoint de análise novo do seu colega -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const btn = document.getElementById("run-analysis-btn");
+            if (btn) {
+                btn.addEventListener("click", async () => {
+                    const versionId = document.getElementById("analysis-version-id").value;
+                    const output = document.getElementById("analysis-result");
+                    if (!versionId) {
+                        output.textContent = "Por favor, informe o ID da versão do artefato.";
+                        return;
+                    }
+                    output.textContent = "Processando análise com IA (isso pode levar alguns segundos)...";
+                    try {
+                        const res = await fetch(`http://127.0.0.1:8000/analyses/versions/${versionId}`, {
+                            method: "POST"
+                        });
+                        const data = await res.json();
+                        if (!res.ok) throw new Error(data.detail || "Erro ao processar análise");
+                        output.textContent = JSON.stringify(data, null, 2);
+                    } catch (err) {
+                        output.textContent = "Erro: " + err.message;
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
