@@ -1,6 +1,7 @@
 from pathlib import Path
 from uuid import uuid4
 import logging
+import os
 
 from fastapi import (
     APIRouter,
@@ -18,7 +19,7 @@ from app.models import Artifact, ArtifactVersion
 
 logger = logging.getLogger(__name__)
 
-STORAGE_DIR = Path("storage")
+STORAGE_DIR = Path(os.getenv("STORAGE_DIR", "storage"))
 
 MAX_FILE_SIZE = 20 * 1024 * 1024  # 20 MB
 
