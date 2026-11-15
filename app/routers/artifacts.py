@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Optional
 from uuid import uuid4
 import logging
+import os
 
 from fastapi import (
     APIRouter,
@@ -24,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 MAX_FILE_SIZE = 20 * 1024 * 1024  # 20 MB
 
-STORAGE_DIR = Path("storage")
+STORAGE_DIR = Path(os.getenv("STORAGE_DIR", "storage"))
 
 ALLOWED_TYPES = {
     "application/pdf": "PDF",
