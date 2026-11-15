@@ -9,10 +9,14 @@ DATABASE_URL = os.getenv(
     "postgresql+psycopg://artifact_user:artifact_password@localhost:5432/artifact_db",
 )
 
+# Em produção deixe SQL_ECHO ausente ou "false" para não encher os logs.
+SQL_ECHO = os.getenv("SQL_ECHO", "false").lower() == "true"
+
 
 engine = create_engine(
     DATABASE_URL,
-    echo=True,
+    echo=SQL_ECHO,
+    pool_pre_ping=True,
 )
 
 
