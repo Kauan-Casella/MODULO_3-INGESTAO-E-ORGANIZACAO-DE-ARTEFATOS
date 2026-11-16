@@ -62,7 +62,7 @@ def root():
 def health_check():
     return {
         "status": "healthy"
-    }
+    } 
 
 
 register_exception_handlers(app)
