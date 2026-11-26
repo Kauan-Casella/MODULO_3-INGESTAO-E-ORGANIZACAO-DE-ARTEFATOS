@@ -28,11 +28,11 @@ body{margin:0;background:var(--color-bg);color:var(--color-text);font:400 var(--
 a{color:var(--link)}
 :focus-visible{outline:2px solid var(--color-primary-hover);outline-offset:2px}
 [data-theme="dark"] :focus-visible{outline-color:var(--color-text)}
-nav{background:var(--color-primary);color:#fff;display:flex;align-items:center;gap:16px;padding:12px 24px}
-nav a{color:#fff;text-decoration:none}
+.topo{background:var(--color-surface);color:var(--color-text);border-bottom:1px solid var(--color-border);display:flex;align-items:center;gap:16px;padding:12px 24px}
+.topo a{color:var(--color-text);text-decoration:none}
 .logo{display:flex;align-items:center;gap:10px;font-weight:600;font-size:var(--text-md)}
 .logo i{width:6px;height:24px;background:var(--color-brand-accent);display:block;border-radius:2px}
-nav .sp{flex:1}
+.topo .sp{flex:1}
 main{max-width:960px;margin:0 auto;padding:24px}
 h1{font-size:var(--text-xl);font-weight:600;margin:0 0 4px}
 h2{font-size:var(--text-lg);font-weight:600;margin:0 0 8px}
@@ -48,7 +48,7 @@ textarea{width:100%;resize:vertical}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 .btn.ghost{background:transparent;color:var(--link);border-color:var(--color-border)}
 .btn.ghost:hover{background:var(--color-bg)}
-nav .btn{font-size:var(--text-sm);padding:8px 12px;background:transparent;border-color:rgba(255,255,255,.4)}
+.topo .btn{font-size:var(--text-sm);padding:8px 12px;background:transparent;color:var(--link);border-color:var(--color-border)}
 .sel{border-left:4px solid var(--color-priority-low)}
 .sel.COMPLETED{border-left-color:var(--color-success)}
 .sel.FAILED{border-left-color:var(--color-priority-critical)}
@@ -68,19 +68,18 @@ ul.ev{margin:6px 0;padding-left:20px}
 .drop{border:2px dashed var(--color-border);border-radius:8px;padding:16px}
 @media (prefers-reduced-motion:no-preference){.bar b{transition:width .4s}}
 </style>
-</head>
-<body>
-<nav>
-  <a class="logo" href="#/"><i></i>Artifact Service</a>
-  <span class="muted" style="color:rgba(255,255,255,.75)">Módulo 3 · Ingestão e organização de artefatos</span>
-  <span class="sp"></span>
-  <button class="btn" id="theme" type="button">Modo escuro</button>
-</nav>
-<main id="app" aria-live="polite"></main>
-
 <script>window.MODULO_ATUAL = 3;</script>
 <script defer src="nav.js"></script>
-  
+</head>
+<body>
+<header class="topo">
+  <a class="logo" href="#/"><i></i>Artifact Service</a>
+  <span class="muted">Módulo 3 · Ingestão e organização de artefatos</span>
+  <span class="sp"></span>
+  <button class="btn" id="theme" type="button">Modo escuro</button>
+</header>
+<main id="app" aria-live="polite"></main>
+
 <script>
 /* URL do back-end: local em desenvolvimento, e a URL pública após o deploy do back (sem barra no final) */
 const PROD_API = "https://modulo3-fhgjdpa6d5bbfvff.canadacentral-01.azurewebsites.net"; // TROCAR após o deploy do back
