@@ -1,6 +1,9 @@
 import os
 
+from pathlib import Path
+from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI
+
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import Base, engine
@@ -66,3 +69,8 @@ def health_check():
 
 
 register_exception_handlers(app)
+
+
+FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
+if FRONTEND_DIR.is_dir():
+    app.mount("/app", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")

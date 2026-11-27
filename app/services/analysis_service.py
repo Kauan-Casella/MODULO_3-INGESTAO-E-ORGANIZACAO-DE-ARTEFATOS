@@ -19,6 +19,7 @@ from app.services.classification_service import (
     ClassificationError,
 )
 
+from app.services.enrichment_service import enrich_document
 
 logger = logging.getLogger(__name__)
 
@@ -119,6 +120,12 @@ def analyze_artifact_version(
         analysis.confidence = classification["confidence"]
         analysis.classification_reason = classification["reason"]
         analysis.classification_evidence = classification["evidence"]
+
+
+        enrichment = enrich_document(document_text)
+        analysis.summary = enrichment["summary"]
+        analysis.architecture = enrichment["architecture"]
+        analysis.extracted_metadata = enrichment["extracted_metadata"]
 
         analysis.status = "COMPLETED"
         analysis.completed_at = datetime.utcnow()
